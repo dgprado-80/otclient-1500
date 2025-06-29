@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -660,7 +660,7 @@ std::string ResourceManager::selfChecksum() {
 }
 
 void ResourceManager::updateFiles(const std::set<std::string>& files) {
-    g_logger.info("Updating client, %i files", files.size());
+    g_logger.info("Updating client, {} files", files.size());
 
     const auto& oldWriteDir = getWriteDir();
     setWriteDir(getWorkDir());
@@ -684,6 +684,7 @@ void ResourceManager::updateFiles(const std::set<std::string>& files) {
         }
     }
     setWriteDir(oldWriteDir);
+    addSearchPath(getWorkDir(), true);
 }
 
 void ResourceManager::updateExecutable(std::string fileName)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -133,7 +133,7 @@ void EventDispatcher::deferEvent(const std::function<void()>& callback) {
         return;
 
     const auto& thread = getThreadTask();
-    thread->hasEvents.store(true, std::memory_order_release);
+    thread->hasDeferEvents.store(true, std::memory_order_release);
     std::scoped_lock l(thread->mutex);
     thread->deferEvents.emplace_back(callback);
 }
@@ -212,6 +212,9 @@ void EventDispatcher::executeDeferEvents() {
         m_deferEventList.clear();
 
         for (const auto& thread : m_threads) {
+            if (!thread->hasDeferEvents.exchange(false, std::memory_order_acquire))
+                continue;
+
             std::scoped_lock lock(thread->mutex);
             if (m_deferEventList.size() < thread->deferEvents.size())
                 m_deferEventList.swap(thread->deferEvents);
